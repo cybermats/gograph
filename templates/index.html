@@ -1,0 +1,18 @@
+{{ define "header-block" }}
+{{ template "splash-block" . }}
+{{ end }}
+
+{{ define "content-block" }}
+{{ template "searchbox-block" . }}
+{{ end }}
+
+
+{{ define "footer-block" }}
+<div class="footer">
+  <a href="/about.html">What now?</a>
+</div>
+{{ end }}
+
+{{ define "index" }}
+{{ template "layout" . }}
+{{ end }}
