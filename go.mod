@@ -3,6 +3,7 @@ module cybermats/gograph
 go 1.13
 
 require (
+	cloud.google.com/go v0.44.1
 	cloud.google.com/go/datastore v1.0.0
 	github.com/gorilla/mux v1.7.3
 	github.com/spf13/cobra v0.0.5 // indirect
