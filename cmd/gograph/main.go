@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cybermats/gograph/internal/searcher"
 	"cybermats/gograph/internal/version"
 	"fmt"
 	"log"
@@ -55,14 +56,14 @@ func initArgs() config {
 	return cfg
 }
 
-func runServer(webDirectory string) {
+func runServer(webDirectory string, s *searcher.Searcher) {
 	router := mux.NewRouter().StrictSlash(true)
 	log.Println("Initializing site...")
 	if err := initSite(router, webDirectory); err != nil {
 		log.Fatal("Failed initializing site: ", err)
 	}
 	log.Println("Initializing API...")
-	if err := initAPI(router); err != nil {
+	if err := initAPI(router, s); err != nil {
 		log.Fatal("Failed initializing API: ", err)
 	}
 
@@ -90,9 +91,9 @@ func main() {
 		return
 	}
 
-	_, err = loadDatabase(cfg.DatabaseFilename)
+	s, err := loadDatabase(cfg.DatabaseFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	runServer(cfg.WebDirectory)
+	runServer(cfg.WebDirectory, s)
 }
