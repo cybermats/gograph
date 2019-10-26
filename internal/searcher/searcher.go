@@ -34,15 +34,20 @@ type SearchInfo struct {
 	ID            string  `json:"t_id"`
 	PrimaryTitle  string  `json:"primary_title"`
 	StartYear     uint16  `json:"start_year"`
-	AverageRating float32 `json:"-"`
+	AverageRating float32 `json:"average_rating"`
 }
 
 // Titles is a list of information for each title.
 type SearchTitles []SearchInfo
 
-func (t SearchTitles) Len() int           { return len(t) }
-func (t SearchTitles) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t SearchTitles) Less(i, j int) bool { return t[i].AverageRating < t[j].AverageRating }
+func (t SearchTitles) Len() int      { return len(t) }
+func (t SearchTitles) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
+func (t SearchTitles) Less(i, j int) bool {
+	if t[i].AverageRating == t[j].AverageRating {
+		return t[i].ID < t[j].ID
+	}
+	return t[i].AverageRating < t[j].AverageRating
+}
 
 // Searcher holds the database
 type Searcher struct {
