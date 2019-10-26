@@ -2,4 +2,4 @@
 
 export GOOGLE_APPLICATION_CREDENTIALS=/home/mats/Downloads/matsf-cloud-playpen-6a43deaeded2.json
 
-(cd web && ../bin/gograph)
+./bin/gograph "$@"

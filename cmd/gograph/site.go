@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 
 	"cybermats/gograph/internal/repository"
+
+	"github.com/gorilla/mux"
 )
 
 func readTemplates(dir string, files ...string) (map[string]*template.Template, error) {
@@ -50,7 +52,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
 
 	data := struct {
 		Title  string
-		Titles []repository.TitleInfo
+		Titles []repository.TitleTopInfo
 	}{"foo bar", topTitles}
 
 	err = t.ExecuteTemplate(w, "index", data)
@@ -67,15 +69,22 @@ func makeTemplateHandler(
 	}
 }
 
-func initSite() error {
-	tmplMap, err := readTemplates("templates", "index.html", "about.html")
+func initSite(router *mux.Router, webDirectory string) error {
+	tmplMap, err := readTemplates(
+		filepath.Join(webDirectory, "templates"),
+		"index.html", "about.html")
 	if err != nil {
 		return err
 	}
-	http.HandleFunc("/",
+	router.HandleFunc("/{id}",
 		makeTemplateHandler(mainHandler, tmplMap["index.html"]))
-	http.HandleFunc("/about.html",
+	router.HandleFunc("/about.html",
 		makeTemplateHandler(aboutHandler, tmplMap["about.html"]))
+
+	dir := filepath.Join(webDirectory, "static")
+	fs := http.FileServer(http.Dir(dir))
+	router.PathPrefix("/static").Handler(http.StripPrefix("/static/", fs))
+	router.Handle("/favicon.ico", fs)
 
 	return nil
 }

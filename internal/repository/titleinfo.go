@@ -11,7 +11,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func GetTop(days int, count int) ([]TitleInfo, error) {
+func GetTop(days int, count int) ([]TitleTopInfo, error) {
 	ctx := context.Background()
 	projectID := "matsf-cloud-playpen"
 
@@ -58,7 +58,7 @@ func GetTop(days int, count int) ([]TitleInfo, error) {
 		return nil, err
 	}
 
-	output := make([]TitleInfo, len(imdbInfo))
+	output := make([]TitleTopInfo, len(imdbInfo))
 
 	for i, key := range keys {
 		id := key.Name
