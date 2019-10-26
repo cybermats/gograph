@@ -1,35 +1,17 @@
-package main
+package repository
 
 import (
 	"context"
 	"log"
 	"time"
 
+	"cybermats/gograph/internal/helper"
+
 	"cloud.google.com/go/datastore"
 	"google.golang.org/api/iterator"
 )
 
-// ImdbInfo is a Datastore entity for storing Imdb basic data
-type imdbInfo struct {
-	Title string // English name
-	Year  int    // Year of production
-}
-
-// TitleView is a Datastore entity for storing when a title was graphed.
-type titleView struct {
-	TID      string    `datastore:"t_id"`     // IMDB Identifier
-	Datetime time.Time `datastore:"datetime"` // Time of a graph view
-}
-
-// TitleInfo contains information about how much a title has been viewed in the last period of time
-type TitleInfo struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
-	Year  int    `json:"year"`
-	Count int    `json:"count"`
-}
-
-func getTop(days int, count int) ([]TitleInfo, error) {
+func GetTop(days int, count int) ([]TitleInfo, error) {
 	ctx := context.Background()
 	projectID := "matsf-cloud-playpen"
 
@@ -58,7 +40,7 @@ func getTop(days int, count int) ([]TitleInfo, error) {
 		}
 		titleMap[item.TID]++
 	}
-	sortedTitles := rankByCount(titleMap)
+	sortedTitles := helper.SortMapByValue(titleMap)
 
 	keys := make([]*datastore.Key, 0, count)
 	for i, p := range sortedTitles {

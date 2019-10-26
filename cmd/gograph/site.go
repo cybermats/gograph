@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"cybermats/gograph/internal/repository"
 )
 
 func readTemplates(dir string, files ...string) (map[string]*template.Template, error) {
@@ -41,14 +43,14 @@ func mainHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
 
 	log.Println("main")
 
-	topTitles, err := getTop(7, 3)
+	topTitles, err := repository.GetTop(7, 3)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	data := struct {
 		Title  string
-		Titles []TitleInfo
+		Titles []repository.TitleInfo
 	}{"foo bar", topTitles}
 
 	err = t.ExecuteTemplate(w, "index", data)

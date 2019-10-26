@@ -1,11 +1,17 @@
 package main
 
 import (
+	"cybermats/gograph/internal/version"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
+	log.Println("GoGraph", version.Get())
+	env := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+	log.Println("Env: ", env)
+
 	if err := initAPI(); err != nil {
 		log.Fatal("Failed initializing API: ", err)
 	}

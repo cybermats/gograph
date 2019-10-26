@@ -1,8 +1,11 @@
-package main
+package helper
 
 import "sort"
 
-func rankByCount(mapCount map[string]int) PairList {
+// SortMapByValue is a helper function which takes a
+// map and outputs a sorted list of pairs, ordered by
+// the value in the maps.
+func SortMapByValue(mapCount map[string]int) PairList {
 	pl := make(PairList, 0, len(mapCount))
 	for k, v := range mapCount {
 		pl = append(pl, Pair{k, v})

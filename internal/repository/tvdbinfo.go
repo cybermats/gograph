@@ -1,4 +1,4 @@
-package main
+package repository
 
 import (
 	"context"
@@ -6,15 +6,7 @@ import (
 	"cloud.google.com/go/datastore"
 )
 
-type tvdbInfo struct {
-	Data []byte
-}
-
-type tvdbImage struct {
-	Path string
-}
-
-func getTvdbInfo(imdbID string) ([]byte, error) {
+func GetTvdbInfo(imdbID string) ([]byte, error) {
 	ctx := context.Background()
 	projectID := "matsf-cloud-playpen"
 
@@ -35,7 +27,7 @@ func getTvdbInfo(imdbID string) ([]byte, error) {
 	return e.Data, nil
 }
 
-func getTvdbImage(imdbID string) (string, error) {
+func GetTvdbImage(imdbID string) (string, error) {
 	ctx := context.Background()
 	projectID := "matsf-cloud-playpen"
 

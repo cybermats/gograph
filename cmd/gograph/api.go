@@ -5,18 +5,18 @@ import (
 	"net/http"
 	"regexp"
 
-	"google.golang.org/appengine"
+	"cybermats/gograph/internal/repository"
 )
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+	//	ctx := appengine.NewContext(r)
 }
 
 func infoHandler(w http.ResponseWriter, r *http.Request, id string) {
 	result := []byte("{}")
 
 	if id != "" {
-		info, err := getTvdbInfo(id)
+		info, err := repository.GetTvdbInfo(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -34,7 +34,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request, id string) {
 	result := make(map[string]string)
 
 	if id != "" {
-		info, err := getTvdbImage(id)
+		info, err := repository.GetTvdbImage(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
