@@ -50,7 +50,7 @@ func (t SearchTitles) Less(i, j int) bool {
 }
 
 // Searcher holds the database
-type Searcher struct {
+type Db struct {
 	titles   map[string]*TitleInfo
 	episodes map[string]*EpisodeInfo
 	lookup   map[string][]string
@@ -60,16 +60,16 @@ func onlyLettersPredicate(c rune) bool {
 	return !unicode.IsLetter(c) && !unicode.IsNumber(c)
 }
 
-func NewSearcher() *Searcher {
-	return &Searcher{
+func NewSearcher() *Db {
+	return &Db{
 		make(map[string]*TitleInfo),
 		make(map[string]*EpisodeInfo),
 		make(map[string][]string),
 	}
 }
 
-func NewSearcherFromFiles(basics io.Reader, episodes io.Reader, ratings io.Reader) (*Searcher, error) {
-	searcher := &Searcher{
+func NewSearcherFromFiles(basics io.Reader, episodes io.Reader, ratings io.Reader) (*Db, error) {
+	searcher := &Db{
 		make(map[string]*TitleInfo),
 		make(map[string]*EpisodeInfo),
 		make(map[string][]string),
@@ -136,7 +136,7 @@ func filterNil(input string) string {
 	return input
 }
 
-func (s *Searcher) addSeason(id string, titleType string, primary string, startYear string, endYear string) {
+func (s *Db) addSeason(id string, titleType string, primary string, startYear string, endYear string) {
 	sy, _ := strconv.ParseInt(startYear, 10, 16)
 	ey, _ := strconv.ParseInt(endYear, 10, 16)
 	s.titles[id] = &TitleInfo{
@@ -157,12 +157,12 @@ func (s *Searcher) addSeason(id string, titleType string, primary string, startY
 	}
 }
 
-func (s *Searcher) addEpisode(id string, primary string) {
+func (s *Db) addEpisode(id string, primary string) {
 	eInfo := EpisodeInfo{PrimaryTitle: primary}
 	s.episodes[id] = &eInfo
 }
 
-func (s *Searcher) linkEpisode(eID string, pID string, seasonNumber string, episodeNumber string) {
+func (s *Db) linkEpisode(eID string, pID string, seasonNumber string, episodeNumber string) {
 	title, ok := s.titles[pID]
 	if !ok {
 		return
@@ -177,7 +177,7 @@ func (s *Searcher) linkEpisode(eID string, pID string, seasonNumber string, epis
 	}
 }
 
-func (s *Searcher) addRating(id string, ratingStr string) {
+func (s *Db) addRating(id string, ratingStr string) {
 	if episode, ok := s.episodes[id]; ok {
 		rating, _ := strconv.ParseFloat(ratingStr, 32)
 		episode.Rating = float32(rating)
@@ -190,11 +190,11 @@ func (s *Searcher) addRating(id string, ratingStr string) {
 	}
 }
 
-func (s *Searcher) pack() {
+func (s *Db) pack() {
 	s.episodes = nil
 }
 
-func (s *Searcher) Search(phrase string) SearchTitles {
+func (s *Db) Search(phrase string) SearchTitles {
 	var superset map[string]bool
 	init := false
 	for _, word := range strings.FieldsFunc(strings.ToLower(phrase), onlyLettersPredicate) {
@@ -234,7 +234,7 @@ func (s *Searcher) Search(phrase string) SearchTitles {
 	return output
 }
 
-func (s *Searcher) Get(id string) (*TitleInfo, error) {
+func (s *Db) Get(id string) (*TitleInfo, error) {
 	title, ok := s.titles[id]
 	if !ok {
 		return nil, errors.New("Nothing found.")
@@ -242,7 +242,7 @@ func (s *Searcher) Get(id string) (*TitleInfo, error) {
 	return title, nil
 }
 
-func (s *Searcher) Write(writer io.Writer) error {
+func (s *Db) Write(writer io.Writer) error {
 	data := struct {
 		Titles map[string]*TitleInfo
 		Lookup map[string][]string
@@ -253,7 +253,7 @@ func (s *Searcher) Write(writer io.Writer) error {
 	return gob.NewEncoder(writer).Encode(data)
 }
 
-func (s *Searcher) Read(reader io.Reader) error {
+func (s *Db) Read(reader io.Reader) error {
 	var data struct {
 		Titles map[string]*TitleInfo
 		Lookup map[string][]string

@@ -10,7 +10,7 @@ import (
 	"cloud.google.com/go/storage"
 )
 
-func initDbFromGCS() (*searcher.Searcher, error) {
+func initDbFromGCS() (*searcher.Db, error) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -65,7 +65,7 @@ func createDatabase(filename string) error {
 	return err
 }
 
-func loadDatabase(filename string) (*searcher.Searcher, error) {
+func loadDatabase(filename string) (*searcher.Db, error) {
 	log.Printf("Loading database from %s...", filename)
 	s := searcher.NewSearcher()
 	b := helper.NewBenchmark("Loading")

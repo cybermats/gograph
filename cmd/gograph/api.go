@@ -15,7 +15,7 @@ type imagePayload struct {
 	URL string `json:"url"`
 }
 
-func searchHandler(w http.ResponseWriter, r *http.Request, s *searcher.Searcher) {
+func searchHandler(w http.ResponseWriter, r *http.Request, s *searcher.Db) {
 	filter := r.FormValue("filter")
 	log.Println("Search: ", filter)
 	titles := s.Search(filter)
@@ -64,14 +64,14 @@ func emptyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func makeSearcherHandler(
-	fn func(http.ResponseWriter, *http.Request, *searcher.Searcher),
-	s *searcher.Searcher) func(http.ResponseWriter, *http.Request) {
+	fn func(http.ResponseWriter, *http.Request, *searcher.Db),
+	s *searcher.Db) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fn(w, r, s)
 	}
 }
 
-func initAPI(router *mux.Router, s *searcher.Searcher) error {
+func initAPI(router *mux.Router, s *searcher.Db) error {
 	sr := router.PathPrefix("/api").Subrouter()
 	sr.HandleFunc("/info/", emptyHandler)
 	sr.HandleFunc("/info/{id}", infoHandler)

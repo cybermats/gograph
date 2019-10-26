@@ -56,7 +56,7 @@ func initArgs() config {
 	return cfg
 }
 
-func runServer(webDirectory string, s *searcher.Searcher) {
+func runServer(webDirectory string, s *searcher.Db) {
 	router := mux.NewRouter().StrictSlash(true)
 	log.Println("Initializing site...")
 	if err := initSite(router, webDirectory); err != nil {
