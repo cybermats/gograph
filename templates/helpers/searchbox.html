@@ -29,7 +29,7 @@
 	    Try your favourite show or take a look at
 	    {{ range $i, $item := .Titles }}{{ if eq (add $i 1) $len }} or
 	    {{ else if ne $i 0 }}, {{ end }}
-	    <a href="/{{ $item.Id }}">{{ $item.Title }} ({{$item.Year}})</a>{{ end }}
+	    <a href="/{{ $item.ID }}">{{ $item.Title }} ({{$item.Year}})</a>{{ end }}.
 	  </div>
 	  {{ end }}
 	</div>
