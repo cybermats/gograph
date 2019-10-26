@@ -100,9 +100,11 @@ func emptyHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func initAPI(router *mux.Router) error {
-	router.HandleFunc("/api/info/", emptyHandler)
-	router.HandleFunc("/api/info/{id}", infoHandler)
-	router.HandleFunc("/api/image/", emptyHandler)
-	router.HandleFunc("/api/image/{id}", imageHandler)
+	s := router.PathPrefix("/api").Subrouter()
+	s.HandleFunc("/info/", emptyHandler)
+	s.HandleFunc("/info/{id}", infoHandler)
+	s.HandleFunc("/image/", emptyHandler)
+	s.HandleFunc("/image/{id}", imageHandler)
+	s.NotFoundHandler = http.HandlerFunc(emptyHandler)
 	return nil
 }

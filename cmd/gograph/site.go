@@ -42,9 +42,7 @@ func aboutHandler(w http.ResponseWriter, r *http.Request, t *template.Template) 
 
 func mainHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
 	//	id := r.URL.Path[1:]
-
 	log.Println("main")
-
 	topTitles, err := repository.GetTop(7, 3)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -61,6 +59,10 @@ func mainHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
 	}
 }
 
+func graphHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
+	log.Println("graph handler")
+}
+
 func makeTemplateHandler(
 	fn func(http.ResponseWriter, *http.Request, *template.Template),
 	tmpls *template.Template) http.HandlerFunc {
@@ -69,22 +71,36 @@ func makeTemplateHandler(
 	}
 }
 
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RequestURI)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func initSite(router *mux.Router, webDirectory string) error {
+	s := router.PathPrefix("/").Subrouter()
+
 	tmplMap, err := readTemplates(
 		filepath.Join(webDirectory, "templates"),
 		"index.html", "about.html")
 	if err != nil {
 		return err
 	}
-	router.HandleFunc("/{id}",
+	s.HandleFunc("/",
 		makeTemplateHandler(mainHandler, tmplMap["index.html"]))
-	router.HandleFunc("/about.html",
+	s.HandleFunc("/{id:tt[0-9]+}",
+		makeTemplateHandler(graphHandler, tmplMap["index.html"]))
+	s.HandleFunc("/about.html",
 		makeTemplateHandler(aboutHandler, tmplMap["about.html"]))
 
 	dir := filepath.Join(webDirectory, "static")
+
 	fs := http.FileServer(http.Dir(dir))
-	router.PathPrefix("/static").Handler(http.StripPrefix("/static/", fs))
-	router.Handle("/favicon.ico", fs)
+	s.PathPrefix("/static").Handler(http.StripPrefix("/static/", fs))
+	s.Handle("/favicon.ico", fs)
+
+	s.Use(loggingMiddleware)
 
 	return nil
 }
