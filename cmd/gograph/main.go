@@ -1,14 +1,15 @@
 package main
 
 import (
-	"cybermats/gograph/internal/searcher"
-	"cybermats/gograph/internal/version"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"reflect"
 	"strings"
+
+	"cybermats/gograph/internal/searcher"
+	"cybermats/gograph/internal/version"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/pflag"

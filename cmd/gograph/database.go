@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"cybermats/gograph/internal/helper"
-	"cybermats/gograph/internal/searcher"
 	"log"
 	"os"
+
+	"cybermats/gograph/internal/helper"
+	"cybermats/gograph/internal/searcher"
 
 	"cloud.google.com/go/storage"
 )
