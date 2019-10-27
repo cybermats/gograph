@@ -56,11 +56,25 @@ $(BINDIR)/$(BINNAME): $(SRC)
 
 
 # ------------------------------------------------------------------------------
+#  vet
+
+.PHONY: vet
+vet: build
+vet: vet-code
+
+.PHONY: vet-code
+vet-code:
+	@echo
+	@echo "==> Running vet <=="
+	GO111MODULE=on go vet $(GOFLAGS) $(PKG)
+
+# ------------------------------------------------------------------------------
 #  test
 
 .PHONY: test
 test: build
-test: TESTFLAGS += -race -v
+test: vet-code
+test: TESTFLAGS += -v
 test: test-unit
 
 .PHONY: test-unit
