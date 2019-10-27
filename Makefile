@@ -54,6 +54,26 @@ build: $(BINDIR)/$(BINNAME)
 $(BINDIR)/$(BINNAME): $(SRC)
 	GO111MODULE=on go build $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $(BINDIR)/$(BINNAME) ./cmd/gograph
 
+
+# ------------------------------------------------------------------------------
+#  test
+
+.PHONY: test
+test: build
+test: TESTFLAGS += -race -v
+test: test-unit
+
+.PHONY: test-unit
+test-unit:
+	@echo
+	@echo "==> Running unit tests <=="
+	GO111MODULE=on go test $(GOFLAGS) -run $(TESTS) $(PKG) $(TESTFLAGS)
+
+
+.PHONY: format
+format: $(GOIMPORTS)
+	GO111MODULE=on go list -f '{{.Dir}}' ./... | xargs $(GOIMPORTS) -w -local cybermats/gograph
+
 # ------------------------------------------------------------------------------
 
 .PHONY: clean

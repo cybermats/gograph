@@ -1,78 +1,18 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 	"sort"
-	"strconv"
-	"strings"
 
 	"cybermats/gograph/internal/repository"
 	"cybermats/gograph/internal/searcher"
 
 	"github.com/gorilla/mux"
 )
-
-func getTVDBMetaData(id string) (interface{}, string, error) {
-	infoStr, err := repository.GetTvdbInfo(id)
-	if err != nil {
-		return "", "", err
-	}
-	var info interface{}
-	err = json.Unmarshal(infoStr, &info)
-	if err != nil {
-		return nil, "", err
-	}
-
-	image, err := repository.GetTvdbImage(id)
-	if err != nil {
-		return nil, "", err
-	}
-	return info, string(image) + "=s256", nil
-}
-
-func readTemplates(dir string, files ...string) (map[string]*template.Template, error) {
-	funcs := template.FuncMap{
-		"add":  func(a int, b int) int { return a + b },
-		"mod":  func(a int, b int) int { return a % b },
-		"join": strings.Join,
-		"makeRange": func(start, end int) []int {
-			o := make([]int, end-start+1)
-			for i := range o {
-				o[i] = start + i
-			}
-			return o
-		},
-		"intJoin": func(a []int, d string) string {
-			o := make([]string, len(a))
-			for i, v := range a {
-				o[i] = strconv.Itoa(v)
-			}
-			return strings.Join(o, d)
-		},
-	}
-	pattern := filepath.Join(dir, "helpers", "*.html")
-	baseTemplates := template.Must(template.New("root").Funcs(funcs).ParseGlob(pattern))
-	tmplMap := make(map[string]*template.Template)
-	for _, file := range files {
-		tmpl, err := baseTemplates.Clone()
-		if err != nil {
-			return nil, err
-		}
-		pattern = filepath.Join(dir, file)
-		_, err = tmpl.ParseFiles(pattern)
-		if err != nil {
-			return nil, err
-		}
-		tmplMap[file] = tmpl
-	}
-
-	return tmplMap, nil
-}
 
 func aboutHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
 	log.Println("about")
@@ -98,39 +38,6 @@ func mainHandler(w http.ResponseWriter, r *http.Request, t *template.Template) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-type trendline struct {
-	X []int
-	Y []float32
-}
-
-type trendlineMaker struct {
-	sumX  float32
-	sumY  float32
-	sumXX float32
-	sumXY float32
-	n     int
-}
-
-func (tm *trendlineMaker) addSample(x, y float32) {
-	tm.sumX += x
-	tm.sumY += y
-	tm.sumXX += x * x
-	tm.sumXY += x * y
-	tm.n++
-}
-
-func (tm *trendlineMaker) trendline(offset int) trendline {
-	if tm.n == 0 || tm.sumX == 0 {
-		return trendline{[]int{0, 0}, []float32{0, 0}}
-	}
-	alpha := (float32(tm.n)*tm.sumXY - tm.sumX*tm.sumY) /
-		(float32(tm.n)*tm.sumXX - tm.sumX*tm.sumX)
-	beta := (tm.sumY - alpha*tm.sumX) / float32(tm.n)
-	xaxis := []int{offset, offset + tm.n - 1}
-	yaxis := []float32{alpha*float32(offset) + beta, alpha*float32(offset+tm.n-1) + beta}
-	return trendline{xaxis, yaxis}
 }
 
 type rating struct {
