@@ -59,7 +59,7 @@ func initArgs() config {
 func runServer(webDirectory string, s *searcher.Db) {
 	router := mux.NewRouter().StrictSlash(true)
 	log.Println("Initializing site...")
-	if err := initSite(router, webDirectory); err != nil {
+	if err := initSite(router, webDirectory, s); err != nil {
 		log.Fatal("Failed initializing site: ", err)
 	}
 	log.Println("Initializing API...")

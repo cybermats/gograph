@@ -20,13 +20,25 @@ type EpisodeInfo struct {
 	Rating       float32 `json:"rating"`
 }
 
+// EpisodesInfo is a collection of EpisodeInfo that is sortable
+type EpisodesInfo []*EpisodeInfo
+
+func (e EpisodesInfo) Len() int      { return len(e) }
+func (e EpisodesInfo) Swap(i, j int) { e[i], e[j] = e[j], e[i] }
+func (e EpisodesInfo) Less(i, j int) bool {
+	if e[i].Season == e[j].Season {
+		return e[i].Episode < e[j].Episode
+	}
+	return e[i].Season < e[j].Season
+}
+
 // TitleInfo is the representation of a single tv series title.
 type TitleInfo struct {
-	PrimaryTitle  string         `json:"primary_title"`
-	StartYear     uint16         `json:"start_year"`
-	EndYear       uint16         `json:"end_year"`
-	AverageRating float32        `json:"average_rating"`
-	Episodes      []*EpisodeInfo `json:"episodes"`
+	PrimaryTitle  string       `json:"primary_title"`
+	StartYear     uint16       `json:"start_year"`
+	EndYear       uint16       `json:"end_year"`
+	AverageRating float32      `json:"average_rating"`
+	Episodes      EpisodesInfo `json:"episodes"`
 }
 
 // SearchInfo is a representation of titles that is returned from search.
@@ -37,7 +49,7 @@ type SearchInfo struct {
 	AverageRating float32 `json:"average_rating"`
 }
 
-// Titles is a list of information for each title.
+// SearchTitles is a list of information for each title.
 type SearchTitles []SearchInfo
 
 func (t SearchTitles) Len() int      { return len(t) }
@@ -49,7 +61,7 @@ func (t SearchTitles) Less(i, j int) bool {
 	return t[i].AverageRating < t[j].AverageRating
 }
 
-// Searcher holds the database
+// Db holds the database
 type Db struct {
 	titles   map[string]*TitleInfo
 	episodes map[string]*EpisodeInfo
@@ -60,6 +72,7 @@ func onlyLettersPredicate(c rune) bool {
 	return !unicode.IsLetter(c) && !unicode.IsNumber(c)
 }
 
+// NewSearcher creates a new, empty Db
 func NewSearcher() *Db {
 	return &Db{
 		make(map[string]*TitleInfo),
@@ -68,6 +81,7 @@ func NewSearcher() *Db {
 	}
 }
 
+// NewSearcherFromFiles creates a Db populated from raw input files.
 func NewSearcherFromFiles(basics io.Reader, episodes io.Reader, ratings io.Reader) (*Db, error) {
 	searcher := &Db{
 		make(map[string]*TitleInfo),
@@ -194,6 +208,7 @@ func (s *Db) pack() {
 	s.episodes = nil
 }
 
+// Search returns all titles that match the phrase, ordered by average ratings, descending
 func (s *Db) Search(phrase string) SearchTitles {
 	var superset map[string]bool
 	init := false
@@ -234,10 +249,11 @@ func (s *Db) Search(phrase string) SearchTitles {
 	return output
 }
 
+// Get returns a single Title, or error if nothing is found.
 func (s *Db) Get(id string) (*TitleInfo, error) {
 	title, ok := s.titles[id]
 	if !ok {
-		return nil, errors.New("Nothing found.")
+		return nil, errors.New("nothing found")
 	}
 	return title, nil
 }
