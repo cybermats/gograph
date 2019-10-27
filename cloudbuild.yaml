@@ -1,8 +1,8 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/matsf-cloud-playpen/gograph']
+    args: ['build', '-t', 'gcr.io/matsf-cloud-playpen/gograph:latest', '.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/matsf-cloud-playpen/gograph']
+    args: ['push', 'gcr.io/matsf-cloud-playpen/gograph:latest']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['beta', 'run', 'deploy', 'gograph', '--image', 'gcr.io/matsf-cloud-playpen/gograph:latest', '--region', 'us-central1', '--platform', 'managed']
-images: ['gcr.io/matsf-cloud-playpen/gograph']
+images: ['gcr.io/matsf-cloud-playpen/gograph:latest']
