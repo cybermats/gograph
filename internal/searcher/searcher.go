@@ -72,8 +72,8 @@ func onlyLettersPredicate(c rune) bool {
 	return !unicode.IsLetter(c) && !unicode.IsNumber(c)
 }
 
-// NewSearcher creates a new, empty Db
-func NewSearcher() *Db {
+// NewDb creates a new, empty Db
+func NewDb() *Db {
 	return &Db{
 		make(map[string]*TitleInfo),
 		make(map[string]*EpisodeInfo),
@@ -81,8 +81,8 @@ func NewSearcher() *Db {
 	}
 }
 
-// NewSearcherFromFiles creates a Db populated from raw input files.
-func NewSearcherFromFiles(basics io.Reader, episodes io.Reader, ratings io.Reader) (*Db, error) {
+// NewDbFromFiles creates a Db populated from raw input files.
+func NewDbFromFiles(basics io.Reader, episodes io.Reader, ratings io.Reader) (*Db, error) {
 	searcher := &Db{
 		make(map[string]*TitleInfo),
 		make(map[string]*EpisodeInfo),

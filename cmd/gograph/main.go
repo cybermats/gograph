@@ -16,6 +16,9 @@ import (
 )
 
 type config struct {
+	BasicsFilename   string
+	EpisodesFilename string
+	RatingsFilename  string
 	CreateDatabase   bool
 	DatabaseFilename string
 	WebDirectory     string
@@ -40,8 +43,16 @@ func initArgs() config {
 		"If True a new database file will be created and no service "+
 			"will be run. If false a database file will be loaded and "+
 			"the service started.")
-	pflag.StringVarP(&cfg.DatabaseFilename, "filename", "f", "",
-		"Path to the database file.")
+	pflag.StringVarP(&cfg.DatabaseFilename, "database", "d", "", "Path to the database file.")
+	pflag.StringVarP(&cfg.BasicsFilename, "basics", "",
+		"gs://matsf-imdb-data/datasets.imdbws.com/title.basics.tsv.gz",
+		"Path to the basics file.")
+	pflag.StringVarP(&cfg.EpisodesFilename, "episodes", "",
+		"gs://matsf-imdb-data/datasets.imdbws.com/title.episode.tsv.gz",
+		"Path to the episodes file.")
+	pflag.StringVarP(&cfg.RatingsFilename, "ratings", "",
+		"gs://matsf-imdb-data/datasets.imdbws.com/title.ratings.tsv.gz",
+		"Path to the ratings file.")
 	pflag.StringVarP(&cfg.WebDirectory, "web-dir", "w", "web",
 		"Directory where the static and template files are located.")
 	help := pflag.BoolP("help", "h", false,
@@ -84,7 +95,11 @@ func main() {
 	var err error
 
 	if cfg.CreateDatabase {
-		err = createDatabase(cfg.DatabaseFilename)
+		err = searcher.CreateDatabase(
+			cfg.BasicsFilename,
+			cfg.EpisodesFilename,
+			cfg.RatingsFilename,
+			cfg.DatabaseFilename)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -92,7 +107,7 @@ func main() {
 		return
 	}
 
-	s, err := loadDatabase(cfg.DatabaseFilename)
+	s, err := searcher.LoadDatabase(cfg.DatabaseFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
