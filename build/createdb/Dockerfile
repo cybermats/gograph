@@ -8,13 +8,12 @@ RUN go mod download
 COPY . ./
 
 #RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -o server ./cmd/gograph
-#RUN go run ./cmd/gograph --filename database.gz --create
-RUN make createdb
+RUN CGO_ENABLED=0 GOOS=linux make createdb
 
 FROM alpine:3
 RUN apk add --no-cache ca-certificates
+WORKDIR /app
 
-COPY --from=builder /app/bin/ /
-COPY --from=builder /app/web /web
+COPY --from=builder /app/bin/createdb /app/createdb
 
-CMD ["/createdb", "--database", "gs://matsf-data/movies.db"]
+CMD ["/app/createdb", "--database", "gs://matsf-data/movies.db"]

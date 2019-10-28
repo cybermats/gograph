@@ -165,5 +165,11 @@ func main() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/create", updateHandlerFunc(cfg))
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Println("No PORT set in env vars. Using default.")
+		port = "8080"
+	}
+	log.Printf("Starting service on port %s...", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
