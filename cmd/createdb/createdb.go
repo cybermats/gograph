@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"reflect"
 	"strings"
@@ -11,13 +10,14 @@ import (
 	"cybermats/gograph/internal/searcher"
 	"cybermats/gograph/internal/version"
 
-	"github.com/gorilla/mux"
 	"github.com/spf13/pflag"
 )
 
 type config struct {
+	BasicsFilename   string
+	EpisodesFilename string
+	RatingsFilename  string
 	DatabaseFilename string
-	WebDirectory     string
 }
 
 func (c config) String() string {
@@ -36,8 +36,15 @@ func initArgs() config {
 	var cfg config
 
 	pflag.StringVarP(&cfg.DatabaseFilename, "database", "d", "", "Path to the database file.")
-	pflag.StringVarP(&cfg.WebDirectory, "web-dir", "w", "web",
-		"Directory where the static and template files are located.")
+	pflag.StringVarP(&cfg.BasicsFilename, "basics", "",
+		"gs://matsf-imdb-data/datasets.imdbws.com/title.basics.tsv.gz",
+		"Path to the basics file.")
+	pflag.StringVarP(&cfg.EpisodesFilename, "episodes", "",
+		"gs://matsf-imdb-data/datasets.imdbws.com/title.episode.tsv.gz",
+		"Path to the episodes file.")
+	pflag.StringVarP(&cfg.RatingsFilename, "ratings", "",
+		"gs://matsf-imdb-data/datasets.imdbws.com/title.ratings.tsv.gz",
+		"Path to the ratings file.")
 	help := pflag.BoolP("help", "h", false,
 		"Show help for all commands.")
 
@@ -51,34 +58,18 @@ func initArgs() config {
 	return cfg
 }
 
-func runServer(webDirectory string, s *searcher.Db) {
-	router := mux.NewRouter().StrictSlash(true)
-	log.Println("Initializing site...")
-	if err := initSite(router, webDirectory, s); err != nil {
-		log.Fatal("Failed initializing site: ", err)
-	}
-	log.Println("Initializing API...")
-	if err := initAPI(router, s); err != nil {
-		log.Fatal("Failed initializing API: ", err)
-	}
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Println("No PORT set in env vars. Using default.")
-		port = "8080"
-	}
-	log.Printf("Starting service on port %s...", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
-}
-
 func main() {
 	cfg := initArgs()
-	log.Println("GoGraph", version.Get())
+	log.Println("createDb", version.Get())
 	log.Println("Config: ", cfg)
 
-	s, err := searcher.LoadDatabase(cfg.DatabaseFilename)
+	err := searcher.CreateDatabase(
+		cfg.BasicsFilename,
+		cfg.EpisodesFilename,
+		cfg.RatingsFilename,
+		cfg.DatabaseFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	runServer(cfg.WebDirectory, s)
+	log.Println("Done.")
 }

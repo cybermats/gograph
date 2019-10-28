@@ -7,6 +7,7 @@ GOX           = $(GOPATH)/bin/gox
 GOIMPORTS     = $(GOPATH)/bin/goimports
 GOLANGCI_LINT = $(GOPATH)/bin/golangci-lint
 
+TARGETS := ${notdir ${shell find ./cmd/* -type d -print}}
 
 # go option
 PKG        := ./...
@@ -43,16 +44,17 @@ LDFLAGS += -X cybermats/gograph/internal/version.gitCommit=${GIT_COMMIT}
 LDFLAGS += -X cybermats/gograph/internal/version.gitTreeState=${GIT_DIRTY}
 
 .PHONY: all
-all: build
+all: build vet test
 
 # ------------------------------------------------------------------------------
 #  build
 
 .PHONY: build
-build: $(BINDIR)/$(BINNAME)
+build: $(TARGETS)
+	@true
 
-$(BINDIR)/$(BINNAME): $(SRC)
-	GO111MODULE=on go build $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $(BINDIR)/$(BINNAME) ./cmd/gograph
+$(TARGETS): $(SRC)
+	GO111MODULE=on go build $(GOFLAGS) -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $(BINDIR)/$@ ./cmd/$@
 
 
 # ------------------------------------------------------------------------------

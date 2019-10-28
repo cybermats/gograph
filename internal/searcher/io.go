@@ -3,11 +3,12 @@ package searcher
 import (
 	"compress/gzip"
 	"context"
-	"cybermats/gograph/internal/helper"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+
+	"cybermats/gograph/internal/helper"
 
 	"cloud.google.com/go/storage"
 )
