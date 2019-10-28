@@ -17,4 +17,4 @@ RUN apk add --no-cache ca-certificates
 COPY --from=builder /app/bin/ /
 COPY --from=builder /app/web /web
 
-CMD ["/gograph", "--filename", "gs://matsf-data/movies.db", "--web-dir", "/web"]
+CMD ["/gograph", "--database", "gs://matsf-data/movies.db", "--web-dir", "/web"]
