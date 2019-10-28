@@ -1,6 +1,6 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/matsf-cloud-playpen/gograph:latest', '.']
+    args: ['build', '-t', 'gcr.io/matsf-cloud-playpen/gograph:latest', '-f', 'build/gograph/Dockerfile', '.']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/matsf-cloud-playpen/gograph:latest']
   - name: 'gcr.io/cloud-builders/gcloud'
