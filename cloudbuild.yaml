@@ -2,7 +2,13 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/matsf-cloud-playpen/gograph:latest', '-f', 'build/gograph/Dockerfile', '.']
   - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/matsf-cloud-playpen/createdb:latest', '-f', 'build/createdb/Dockerfile', '.']
+  - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/matsf-cloud-playpen/gograph:latest']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/matsf-cloud-playpen/createdb:latest']
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['beta', 'run', 'deploy', 'gograph', '--image', 'gcr.io/matsf-cloud-playpen/gograph:latest', '--region', 'us-central1', '--platform', 'managed']
-images: ['gcr.io/matsf-cloud-playpen/gograph:latest']
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['beta', 'run', 'deploy', 'createdb', '--image', 'gcr.io/matsf-cloud-playpen/createdb:latest', '--region', 'us-central1', '--platform', 'managed']
+images: ['gcr.io/matsf-cloud-playpen/gograph:latest', 'gcr.io/matsf-cloud-playpen/createdb:latest']
