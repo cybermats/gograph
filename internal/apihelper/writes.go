@@ -11,6 +11,10 @@ type errorPayload struct {
 	StatusCode int    `json:"status_code"`
 }
 
+type messagePayload struct {
+	Message string `json:"message"`
+}
+
 // WriteJSON helps writing headers and marshalling objects for a JSON response
 func WriteJSON(w http.ResponseWriter, data interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -33,6 +37,12 @@ func WriteJSONFromText(w http.ResponseWriter, data []byte, statusCode int) {
 
 // WriteOK creates a JSON response with StatusOK.
 func WriteOK(w http.ResponseWriter, data interface{}) {
+	WriteJSON(w, data, http.StatusOK)
+}
+
+// WriteOKMessage creates a JSON response with StatusOK.
+func WriteOKMessage(w http.ResponseWriter, message string) {
+	data := messagePayload{message}
 	WriteJSON(w, data, http.StatusOK)
 }
 

@@ -20,3 +20,7 @@ func NewBenchmark(name string) Benchmark {
 func (b Benchmark) Println() {
 	log.Printf("%s took %v\n", b.name, time.Now().Sub(b.start))
 }
+
+func (b Benchmark) Duration() time.Duration {
+	return time.Now().Sub(b.start)
+}
